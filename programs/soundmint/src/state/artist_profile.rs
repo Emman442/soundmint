@@ -29,6 +29,13 @@ impl ArtistProfile {
     pub const U8_LENGTH: usize = 1;
     pub const STRING_PREFIX_LENGTH: usize = 4; // Length prefix for strings
     pub const VECTOR_PREFIX_LENGTH: usize = 4; // Length prefix for vectors
+
+    pub const MAX_NAME_LENGTH: usize = 50;
+    pub const MAX_DESCRIPTION_LENGTH: usize = 200;
+    pub const MAX_URI_LENGTH: usize = 200;
+    pub const MAX_SOCIAL_LINKS: usize = 5;
+    pub const MAX_PLATFORM_LENGTH: usize = 20;
+    pub const MAX_URL_LENGTH: usize = 100;
     
     pub const INIT_SPACE: usize = 
         Self::DISCRIMINATOR_LENGTH +
