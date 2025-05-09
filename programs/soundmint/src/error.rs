@@ -31,4 +31,10 @@ pub enum CustomError {
     
     #[msg("Master NFT not found")]
     MasterNftNotFound,
+
+    #[msg("Too many collaborators")]
+    TooManyCollaborators,
+
+    #[msg("Too many metadata items")]
+    TooManyMetadataItems,
 }

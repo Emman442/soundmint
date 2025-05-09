@@ -38,4 +38,39 @@ pub mod soundmint {
     ) -> Result<()> {
         artist::update_artist_profile(context, name, description, profile_image_uri, social_links)
     }
+
+        pub fn mint_master_nft(
+        context: Context<MintMasterNftAccountConstraints>,
+        title: String,
+        description: String,
+        audio_uri: String,
+        artwork_uri: String,
+        metadata: Vec<MetadataItem>
+    ) -> Result<()> {
+        nft::mint_master_nft(context, title, description, audio_uri, artwork_uri, metadata)
+    }
+    
+    pub fn update_master_nft(
+        context: Context<UpdateMasterNftAccountConstraints>,
+        description: Option<String>,
+        metadata: Option<Vec<MetadataItem>>,
+        is_transferable: Option<bool>,
+        status: Option<MasterNftStatus>
+    ) -> Result<()> {
+        nft::update_master_nft(context, description, metadata, is_transferable, status)
+    }
+    
+    pub fn create_royalty_split(
+        context: Context<CreateRoyaltySplitAccountConstraints>,
+        collaborators: Vec<Collaborator>
+    ) -> Result<()> {
+        royalty::create_royalty_split(context, collaborators)
+    }
+    
+    pub fn mint_royalty_nft(
+        context: Context<MintRoyaltyNftAccountConstraints>,
+        share_basis_points: u16
+    ) -> Result<()> {
+        royalty::mint_royalty_nft(context, share_basis_points)
+    }
 }
