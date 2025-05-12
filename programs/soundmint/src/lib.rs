@@ -98,10 +98,46 @@ pub mod soundmint {
         admin::treasury::update_treasury_config(context, mint_fee, platform_fee_basis_points, new_treasury_wallet)
     }
 
+    pub fn update_streaming_provider(
+        context: Context<UpdateTreasuryConfigAccountConstraints>,
+        new_streaming_provider: Pubkey
+    ) -> Result<()> {
+        admin::treasury::update_streaming_provider(context, new_streaming_provider)
+    }
+
     pub fn withdraw_treasury_funds(
         context: Context<WithdrawTreasuryFundsAccountConstraints>,
         amount: u64
     ) -> Result<()> {
         admin::treasury::withdraw_treasury_funds(context, amount)
+    }
+
+    pub fn verify_artist(
+        context: Context<VerifyArtistAccountConstraints>,
+        verify: bool
+    ) -> Result<()> {
+        admin::artist::verify_artist(context, verify)
+    }
+
+    pub fn register_streaming_batch(
+        context: Context<RegisterStreamingBatchAccountConstraints>,
+        streaming_data: Vec<StreamingData>
+    ) -> Result<()> {
+        streaming::register_streaming_batch(context, streaming_data)
+    }
+
+    pub fn create_collection(
+        context: Context<CreateCollectionAccountConstraints>,
+        name: String,
+        description: String,
+        uri: String
+    ) -> Result<()> {
+        collection::create_collection(context, name, description, uri)
+        
+    }
+    pub fn add_to_collection(
+        context: Context<AddToCollectionAccountConstraints>
+    ) -> Result<()> {
+        collection::add_to_collection(context)
     }
 }

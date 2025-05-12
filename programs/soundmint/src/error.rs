@@ -49,4 +49,13 @@ pub enum CustomError {
 
     #[msg("Invalid treasury wallet")]
     InvalidTreasuryWallet,
+
+    #[msg("Invalid data format or contents")]
+    InvalidData,
+    
+    #[msg("Batch size exceeds maximum allowed")]
+    BatchTooLarge,
+    
+    #[msg("Collection not found")]
+    CollectionNotFound,
 }

@@ -12,6 +12,7 @@ pub const DEFAULT_PLATFORM_FEE: u16 = 500;     // 5% in basis points
 
 // NFT config
 pub const MAX_METADATA_ITEMS: usize = 10;
+pub const MAX_STREAMING_BATCH_SIZE: usize = 50;
 
 // Collection configuration
 pub const SOUND_MINT_COLLECTION_PREFIX: &[u8] = b"sound_mint_collection";

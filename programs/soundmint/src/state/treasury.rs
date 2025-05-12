@@ -4,6 +4,7 @@ use anchor_lang::prelude::*;
 pub struct Treasury {
     pub authority: Pubkey,
     pub treasury_wallet: Pubkey,
+    pub streaming_provider: Pubkey,
     pub mint_fee: u64,
     pub platform_fee_basis_points: u16,
     pub total_revenue_collected: u64,
@@ -24,6 +25,7 @@ impl Treasury {
         Self::DISCRIMINATOR_LENGTH +
         Self::PUBKEY_LENGTH +     // authority
         Self::PUBKEY_LENGTH +     // treasury_wallet
+        Self::PUBKEY_LENGTH +     // streaming_provider
         Self::U64_LENGTH +        // mint_fee
         Self::U16_LENGTH +        // platform_fee_basis_points
         Self::U64_LENGTH +        // total_revenue_collected

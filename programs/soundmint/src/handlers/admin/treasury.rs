@@ -41,6 +41,26 @@ pub fn update_treasury_config(
     Ok(())
 }
 
+pub fn update_streaming_provider(
+    context: Context<UpdateTreasuryConfigAccountConstraints>,
+    new_streaming_provider: Pubkey
+) -> Result<()> {
+    let treasury = &mut context.accounts.treasury;
+    let clock = Clock::get()?;
+    
+    // Only allow changes if authority is the signer
+    require!(
+        treasury.authority == context.accounts.authority.key(),
+        CustomError::Unauthorized
+    );
+    
+    treasury.streaming_provider = new_streaming_provider;
+    treasury.updated_at = clock.unix_timestamp;
+    
+    msg!("Streaming provider updated to: {}", new_streaming_provider);
+    Ok(())
+}
+
 pub fn withdraw_treasury_funds(
     context: Context<WithdrawTreasuryFundsAccountConstraints>,
     amount: u64

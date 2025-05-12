@@ -7,6 +7,7 @@ pub fn handler(context: Context<Initialize>) -> Result<()> {
     
     treasury.authority = context.accounts.authority.key();
     treasury.treasury_wallet = context.accounts.treasury_wallet.key();
+    treasury.streaming_provider = context.accounts.authority.key(); // Set default
     treasury.mint_fee = 10_000_000; // 0.01 SOL default fee
     treasury.platform_fee_basis_points = 500; // 5% default platform fee
     treasury.total_revenue_collected = 0;
