@@ -40,4 +40,13 @@ pub enum CustomError {
 
     #[msg("Too many metadata items")]
     TooManyMetadataItems,
+
+    #[msg("Amount too small to process")]
+    AmountTooSmall,
+
+    #[msg("Invalid fee percentage")]
+    InvalidFeePercentage,
+
+    #[msg("Invalid treasury wallet")]
+    InvalidTreasuryWallet,
 }
