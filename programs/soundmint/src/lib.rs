@@ -73,4 +73,35 @@ pub mod soundmint {
     ) -> Result<()> {
         royalty::mint_royalty_nft(context, share_basis_points)
     }
+
+    pub fn track_revenue(
+        context: Context<TrackRevenueAccountConstraints>,
+        amount: u64,
+        source: String,
+        description: String
+    ) -> Result<()> {
+        revenue::track_revenue(context, amount, source, description)
+    }
+
+    pub fn claim_revenue(
+        context: Context<ClaimRevenueAccountConstraints>
+    ) -> Result<()> {
+        revenue::claim_revenue(context)
+    }
+
+    pub fn update_treasury_config(
+        context: Context<UpdateTreasuryConfigAccountConstraints>,
+        mint_fee: Option<u64>,
+        platform_fee_basis_points: Option<u16>,
+        new_treasury_wallet: Option<Pubkey>
+    ) -> Result<()> {
+        admin::treasury::update_treasury_config(context, mint_fee, platform_fee_basis_points, new_treasury_wallet)
+    }
+
+    pub fn withdraw_treasury_funds(
+        context: Context<WithdrawTreasuryFundsAccountConstraints>,
+        amount: u64
+    ) -> Result<()> {
+        admin::treasury::withdraw_treasury_funds(context, amount)
+    }
 }

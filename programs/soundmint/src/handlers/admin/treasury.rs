@@ -3,6 +3,7 @@ use crate::state::*;
 use crate::error::CustomError;
 use crate::constants::*;
 
+
 pub fn update_treasury_config(
     context: Context<UpdateTreasuryConfigAccountConstraints>,
     mint_fee: Option<u64>,
