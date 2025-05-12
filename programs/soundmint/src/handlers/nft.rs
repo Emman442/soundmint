@@ -1,128 +1,128 @@
-// use anchor_lang::prelude::*;
-// use anchor_spl::token::{Mint, Token, TokenAccount};
-// use mpl_token_metadata::instructions::{CreateMetadataAccountV3, CreateMetadataAccountV3InstructionArgs};
-// use mpl_token_metadata::types::{Creator, DataV2};
-// use anchor_spl::associated_token::AssociatedToken;
-// use crate::state::*;
-// use crate::error::CustomError;
-// use crate::constants::*;
+use anchor_lang::prelude::*;
+use anchor_spl::token::{Mint, Token, TokenAccount};
+use mpl_token_metadata::instructions::{CreateMetadataAccountV3, CreateMetadataAccountV3InstructionArgs};
+use mpl_token_metadata::types::{Creator, DataV2};
+use anchor_spl::associated_token::AssociatedToken;
+use crate::state::*;
+use crate::error::CustomError;
+use crate::constants::*;
 
-// pub fn mint_master_nft(
-//     context: Context<MintMasterNftAccountConstraints>,
-//     title: String,
-//     description: String,
-//     audio_uri: String,
-//     artwork_uri: String,
-//     metadata: Vec<MetadataItem>
-// ) -> Result<()> {
-//     // Validate input lengths
-//     require!(title.len() <= 100, CustomError::StringTooLong);
-//     require!(description.len() <= 500, CustomError::StringTooLong);
-//     require!(audio_uri.len() <= 200, CustomError::StringTooLong);
-//     require!(artwork_uri.len() <= 200, CustomError::StringTooLong);
-//     require!(metadata.len() <= MAX_METADATA_ITEMS, CustomError::TooManyMetadataItems);
+pub fn mint_master_nft(
+    context: Context<MintMasterNftAccountConstraints>,
+    title: String,
+    description: String,
+    audio_uri: String,
+    artwork_uri: String,
+    metadata: Vec<MetadataItem>
+) -> Result<()> {
+    // Validate input lengths
+    require!(title.len() <= 100, CustomError::StringTooLong);
+    require!(description.len() <= 500, CustomError::StringTooLong);
+    require!(audio_uri.len() <= 200, CustomError::StringTooLong);
+    require!(artwork_uri.len() <= 200, CustomError::StringTooLong);
+    require!(metadata.len() <= MAX_METADATA_ITEMS, CustomError::TooManyMetadataItems);
     
-//     // Validate metadata items
-//     for item in &metadata {
-//         require!(item.key.len() <= 50, CustomError::StringTooLong);
-//         require!(item.value.len() <= 50, CustomError::StringTooLong);
-//     }
+    // Validate metadata items
+    for item in &metadata {
+        require!(item.key.len() <= 50, CustomError::StringTooLong);
+        require!(item.value.len() <= 50, CustomError::StringTooLong);
+    }
     
-//     let clock = Clock::get()?;
+    let clock = Clock::get()?;
     
-//     // Get accounts
-//     let master_nft = &mut context.accounts.master_nft;
-//     let artist_profile = &mut context.accounts.artist_profile;
-//     let treasury = &mut context.accounts.treasury;
+    // Get accounts
+    let master_nft = &mut context.accounts.master_nft;
+    let artist_profile = &mut context.accounts.artist_profile;
+    let treasury = &mut context.accounts.treasury;
     
-//     // Collect mint fee
-//     if treasury.mint_fee > 0 {
-//         require!(
-//             **context.accounts.authority.lamports.borrow() > treasury.mint_fee,
-//             CustomError::InsufficientFunds
-//         );
+    // Collect mint fee
+    if treasury.mint_fee > 0 {
+        require!(
+            **context.accounts.authority.lamports.borrow() > treasury.mint_fee,
+            CustomError::InsufficientFunds
+        );
         
-//         // Transfer fee to treasury wallet
-//         let transfer_instruction = anchor_lang::solana_program::system_instruction::transfer(
-//             &context.accounts.authority.key(),
-//             &treasury.treasury_wallet,
-//             treasury.mint_fee
-//         );
+        // Transfer fee to treasury wallet
+        let transfer_instruction = anchor_lang::solana_program::system_instruction::transfer(
+            &context.accounts.authority.key(),
+            &treasury.treasury_wallet,
+            treasury.mint_fee
+        );
         
-//         anchor_lang::solana_program::program::invoke(
-//             &transfer_instruction,
-//             &[
-//                 context.accounts.authority.to_account_info(),
-//                 context.accounts.treasury_wallet.to_account_info(),
-//                 context.accounts.system_program.to_account_info(),
-//             ]
-//         )?;
+        anchor_lang::solana_program::program::invoke(
+            &transfer_instruction,
+            &[
+                context.accounts.authority.to_account_info(),
+                context.accounts.treasury_wallet.to_account_info(),
+                context.accounts.system_program.to_account_info(),
+            ]
+        )?;
         
-//         treasury.total_revenue_collected = treasury.total_revenue_collected.checked_add(treasury.mint_fee).unwrap();
-//     }
+        treasury.total_revenue_collected = treasury.total_revenue_collected.checked_add(treasury.mint_fee).unwrap();
+    }
     
-//     // Update artist profile
-//     artist_profile.track_count = artist_profile.track_count.checked_add(1).unwrap();
+    // Update artist profile
+    artist_profile.track_count = artist_profile.track_count.checked_add(1).unwrap();
     
-//     // Initialize master NFT data
-//     master_nft.title = title;
-//     master_nft.description = description;
-//     master_nft.artist_profile = artist_profile.key();
-//     master_nft.audio_uri = audio_uri;
-//     master_nft.artwork_uri = artwork_uri;
-//     master_nft.metadata = metadata;
-//     master_nft.mint = context.accounts.mint.key();
-//     master_nft.is_transferable = true;
-//     master_nft.status = MasterNftStatus::Active;
-//     master_nft.created_at = clock.unix_timestamp;
-//     master_nft.bump = context.bumps.master_nft;
+    // Initialize master NFT data
+    master_nft.title = title;
+    master_nft.description = description;
+    master_nft.artist_profile = artist_profile.key();
+    master_nft.audio_uri = audio_uri;
+    master_nft.artwork_uri = artwork_uri;
+    master_nft.metadata = metadata;
+    master_nft.mint = context.accounts.mint.key();
+    master_nft.is_transferable = true;
+    master_nft.status = MasterNftStatus::Active;
+    master_nft.created_at = clock.unix_timestamp;
+    master_nft.bump = context.bumps.master_nft;
     
-//     // Create NFT metadata using Metaplex
-//     let metadata_title = master_nft.title.clone();
-//     let metadata_symbol = "SNDM".to_string();
-//     let creator = vec![
-//         anchor_spl::metadata::Creator {
-//             address: context.accounts.authority.key(),
-//             verified: true,
-//             share: 100,
-//         }
-//     ];
+    // Create NFT metadata using Metaplex
+    let metadata_title = master_nft.title.clone();
+    let metadata_symbol = "SNDM".to_string();
+    let creator = vec![
+        anchor_spl::metadata::Creator {
+            address: context.accounts.authority.key(),
+            verified: true,
+            share: 100,
+        }
+    ];
     
-//     let metadata_uri_json = format!("{{\"name\":\"{}\",\"description\":\"{}\",\"image\":\"{}\",\"animation_url\":\"{}\"}}",
-//         metadata_title,
-//         master_nft.description,
-//         master_nft.artwork_uri,
-//         master_nft.audio_uri
-//     );
+    let metadata_uri_json = format!("{{\"name\":\"{}\",\"description\":\"{}\",\"image\":\"{}\",\"animation_url\":\"{}\"}}",
+        metadata_title,
+        master_nft.description,
+        master_nft.artwork_uri,
+        master_nft.audio_uri
+    );
     
-//     // Create metadata using Metaplex functions
-//     create_metadata_accounts_v3(
-//         CpiContext::new(
-//             context.accounts.token_metadata_program.to_account_info(),
-//             CreateMetadataAccountsV3 {
-//                 metadata: context.accounts.metadata_account.to_account_info(),
-//                 mint: context.accounts.mint.to_account_info(),
-//                 mint_authority: context.accounts.authority.to_account_info(),
-//                 payer: context.accounts.authority.to_account_info(),
-//                 update_authority: context.accounts.authority.to_account_info(),
-//                 system_program: context.accounts.system_program.to_account_info(),
-//                 rent: context.accounts.rent.to_account_info(),
-//             },
-//         ),
-//         metadata_uri_json,
-//         metadata_symbol,
-//         creator,
-//         100, // Royalty basis points - 1%
-//         true,
-//         true,
-//         None,
-//         None,
-//         None,
-//     )?;
+    // Create metadata using Metaplex functions
+    create_metadata_accounts_v3(
+        CpiContext::new(
+            context.accounts.token_metadata_program.to_account_info(),
+            CreateMetadataAccountsV3 {
+                metadata: context.accounts.metadata_account.to_account_info(),
+                mint: context.accounts.mint.to_account_info(),
+                mint_authority: context.accounts.authority.to_account_info(),
+                payer: context.accounts.authority.to_account_info(),
+                update_authority: context.accounts.authority.to_account_info(),
+                system_program: context.accounts.system_program.to_account_info(),
+                rent: context.accounts.rent.to_account_info(),
+            },
+        ),
+        metadata_uri_json,
+        metadata_symbol,
+        creator,
+        100, // Royalty basis points - 1%
+        true,
+        true,
+        None,
+        None,
+        None,
+    )?;
     
-//     msg!("Master NFT created: {}", master_nft.title);
-//     Ok(())
-// }
+    msg!("Master NFT created: {}", master_nft.title);
+    Ok(())
+}
 
 // use anchor_lang::prelude::*;
 // use anchor_spl::token::{Mint, Token, TokenAccount};
@@ -263,137 +263,158 @@
 // }
 
 
-use anchor_lang::prelude::*;
-use anchor_spl::token::{Mint, Token, TokenAccount};
-use anchor_spl::associated_token::AssociatedToken;
-use mpl_token_metadata::instructions as token_metadata_instructions;
-use crate::state::*;
-use crate::error::CustomError;
-use crate::constants::*;
+// use anchor_lang::prelude::*;
+// use anchor_spl::token::{Mint, Token, TokenAccount};
+// // use anchor_spl::associated_token::AssociatedToken;
+// use anchor_spl::{
+//     associated_token::AssociatedToken,
+//     metadata::{
+//         Metadata,
+//         MetadataAccount,
+//         MasterEditionAccount,
+//     },
+//     token_interface::{
+//         TokenInterface,
+//         Mint,
+//         TokenAccount,
+//         TransferChecked,
+//         transfer_checked,
+//     }
+// };
+// use mpl_token_metadata::instructions as token_metadata_instructions;
+// use crate::state::{
+//     MasterNft,
+//     ArtistProfile,
+//     Treasury,
+//     MetadataItem,
+//     MasterNftStatus,
+// };
+// use crate::error::CustomError;
+// use crate::constants::*;
 
-pub fn mint_master_nft(
-    context: Context<MintMasterNftAccountConstraints>,
-    title: String,
-    description: String,
-    audio_uri: String,
-    artwork_uri: String,
-    metadata: Vec<MetadataItem>
-) -> Result<()> {
-    // Validate input lengths
-    require!(title.len() <= 100, CustomError::StringTooLong);
-    require!(description.len() <= 500, CustomError::StringTooLong);
-    require!(audio_uri.len() <= 200, CustomError::StringTooLong);
-    require!(artwork_uri.len() <= 200, CustomError::StringTooLong);
-    require!(metadata.len() <= MAX_METADATA_ITEMS, CustomError::TooManyMetadataItems);
+// pub fn mint_master_nft(
+//     context: Context<MintMasterNftAccountConstraints>,
+//     title: String,
+//     description: String,
+//     audio_uri: String,
+//     artwork_uri: String,
+//     metadata: Vec<MetadataItem>
+// ) -> Result<()> {
+//     // Validate input lengths
+//     require!(title.len() <= 100, CustomError::StringTooLong);
+//     require!(description.len() <= 500, CustomError::StringTooLong);
+//     require!(audio_uri.len() <= 200, CustomError::StringTooLong);
+//     require!(artwork_uri.len() <= 200, CustomError::StringTooLong);
+//     require!(metadata.len() <= MAX_METADATA_ITEMS, CustomError::TooManyMetadataItems);
     
-    // Validate metadata items
-    for item in &metadata {
-        require!(item.key.len() <= 50, CustomError::StringTooLong);
-        require!(item.value.len() <= 50, CustomError::StringTooLong);
-    }
+//     // Validate metadata items
+//     for item in &metadata {
+//         require!(item.key.len() <= 50, CustomError::StringTooLong);
+//         require!(item.value.len() <= 50, CustomError::StringTooLong);
+//     }
     
-    let clock = Clock::get()?;
+//     let clock = Clock::get()?;
     
-    // Get accounts
-    let master_nft = &mut context.accounts.master_nft;
-    let artist_profile = &mut context.accounts.artist_profile;
-    let treasury = &mut context.accounts.treasury;
+//     // Get accounts
+//     let master_nft = &mut context.accounts.master_nft;
+//     let artist_profile = &mut context.accounts.artist_profile;
+//     let treasury = &mut context.accounts.treasury;
     
-    // Collect mint fee
-    if treasury.mint_fee > 0 {
-        require!(
-            **context.accounts.authority.lamports.borrow() > treasury.mint_fee,
-            CustomError::InsufficientFunds
-        );
+//     // Collect mint fee
+//     if treasury.mint_fee > 0 {
+//         require!(
+//             **context.accounts.authority.lamports.borrow() > treasury.mint_fee,
+//             CustomError::InsufficientFunds
+//         );
         
-        // Transfer fee to treasury wallet
-        let transfer_instruction = anchor_lang::solana_program::system_instruction::transfer(
-            &context.accounts.authority.key(),
-            &treasury.treasury_wallet,
-            treasury.mint_fee
-        );
+//         // Transfer fee to treasury wallet
+//         let transfer_instruction = anchor_lang::solana_program::system_instruction::transfer(
+//             &context.accounts.authority.key(),
+//             &treasury.treasury_wallet,
+//             treasury.mint_fee
+//         );
         
-        anchor_lang::solana_program::program::invoke(
-            &transfer_instruction,
-            &[
-                context.accounts.authority.to_account_info(),
-                context.accounts.treasury_wallet.to_account_info(),
-                context.accounts.system_program.to_account_info(),
-            ]
-        )?;
+//         anchor_lang::solana_program::program::invoke(
+//             &transfer_instruction,
+//             &[
+//                 context.accounts.authority.to_account_info(),
+//                 context.accounts.treasury_wallet.to_account_info(),
+//                 context.accounts.system_program.to_account_info(),
+//             ]
+//         )?;
         
-        treasury.total_revenue_collected = treasury.total_revenue_collected.checked_add(treasury.mint_fee).unwrap();
-    }
+//         treasury.total_revenue_collected = treasury.total_revenue_collected.checked_add(treasury.mint_fee).unwrap();
+//     }
     
-    // Update artist profile
-    artist_profile.track_count = artist_profile.track_count.checked_add(1).unwrap();
+//     // Update artist profile
+//     artist_profile.track_count = artist_profile.track_count.checked_add(1).unwrap();
     
-    // Initialize master NFT data
-    master_nft.title = title;
-    master_nft.description = description;
-    master_nft.artist_profile = artist_profile.key();
-    master_nft.audio_uri = audio_uri;
-    master_nft.artwork_uri = artwork_uri;
-    master_nft.metadata = metadata;
-    master_nft.mint = context.accounts.mint.key();
-    master_nft.is_transferable = true;
-    master_nft.status = MasterNftStatus::Active;
-    master_nft.created_at = clock.unix_timestamp;
-    master_nft.bump = context.bumps.master_nft;
+//     // Initialize master NFT data
+//     master_nft.title = title;
+//     master_nft.description = description;
+//     master_nft.artist_profile = artist_profile.key();
+//     master_nft.audio_uri = audio_uri;
+//     master_nft.artwork_uri = artwork_uri;
+//     master_nft.metadata = metadata;
+//     master_nft.mint = context.accounts.mint.key();
+//     master_nft.is_transferable = true;
+//     master_nft.status = MasterNftStatus::Active;
+//     master_nft.created_at = clock.unix_timestamp;
+//     master_nft.bump = context.bumps.master_nft;
     
-    // Create NFT metadata using Metaplex
-    let metadata_title = master_nft.title.clone();
-    let metadata_symbol = "SNDM".to_string();
+//     // Create NFT metadata using Metaplex
+//     let metadata_title = master_nft.title.clone();
+//     let metadata_symbol = "SNDM".to_string();
     
-    // Create metadata URI JSON with audio
-    let metadata_uri = format!("{{\"name\":\"{}\",\"description\":\"{}\",\"image\":\"{}\",\"animation_url\":\"{}\"}}",
-        metadata_title,
-        master_nft.description,
-        master_nft.artwork_uri,
-        master_nft.audio_uri
-    );
+//     // Create metadata URI JSON with audio
+//     let metadata_uri = format!("{{\"name\":\"{}\",\"description\":\"{}\",\"image\":\"{}\",\"animation_url\":\"{}\"}}",
+//         metadata_title,
+//         master_nft.description,
+//         master_nft.artwork_uri,
+//         master_nft.audio_uri
+//     );
 
-    // Create the creators array using the new Metaplex v5 structure
-    let creators = vec![
-        token_metadata_instructions::CreateV1CpiBuilder::new()
-            .creator(context.accounts.authority.key(), true, 100)
-            .to_creator(),
-    ];
+//     // Create the creators array using the new Metaplex v5 structure
+//     let creators = vec![
+//         token_metadata_instructions::CreateV1CpiBuilder::new()
+//             .creator(context.accounts.authority.key(), true, 100)
+//             .to_creator(),
+//     ];
 
-    // Create the metadata creation instruction using the MPL Token Metadata v5.1.0 builder
-    let create_metadata_ix = token_metadata_instructions::CreateV1CpiBuilder::new()
-        .metadata(context.accounts.metadata_account.key())
-        .mint(context.accounts.mint.key())
-        .authority(context.accounts.authority.key())
-        .payer(context.accounts.authority.key())
-        .update_authority(context.accounts.authority.key(), true)
-        .name(metadata_title)
-        .symbol(metadata_symbol)
-        .uri(metadata_uri)
-        .creators(creators)
-        .seller_fee_basis_points(100) // 1%
-        .collection_details_toggle(false)
-        .build()
-        .instruction();
+//     // Create the metadata creation instruction using the MPL Token Metadata v5.1.0 builder
+//     let create_metadata_ix = token_metadata_instructions::CreateV1CpiBuilder::new()
+//         .metadata(context.accounts.metadata_account.key())
+//         .mint(context.accounts.mint.key())
+//         .authority(context.accounts.authority.key())
+//         .payer(context.accounts.authority.key())
+//         .update_authority(context.accounts.authority.key(), true)
+//         .name(metadata_title)
+//         .symbol(metadata_symbol)
+//         .uri(metadata_uri)
+//         .creators(creators)
+//         .seller_fee_basis_points(100) // 1%
+//         .collection_details_toggle(false)
+//         .build()
+//         .instruction();
     
-    // Invoke the instruction
-    anchor_lang::solana_program::program::invoke(
-        &create_metadata_ix,
-        &[
-            context.accounts.metadata_account.to_account_info(),
-            context.accounts.mint.to_account_info(),
-            context.accounts.authority.to_account_info(),
-            context.accounts.authority.to_account_info(),
-            context.accounts.authority.to_account_info(),
-            context.accounts.token_metadata_program.to_account_info(),
-            context.accounts.system_program.to_account_info(),
-            context.accounts.rent.to_account_info(),
-        ],
-    )?;
+//     // Invoke the instruction
+//     anchor_lang::solana_program::program::invoke(
+//         &create_metadata_ix,
+//         &[
+//             context.accounts.metadata_account.to_account_info(),
+//             context.accounts.mint.to_account_info(),
+//             context.accounts.authority.to_account_info(),
+//             context.accounts.authority.to_account_info(),
+//             context.accounts.authority.to_account_info(),
+//             context.accounts.token_metadata_program.to_account_info(),
+//             context.accounts.system_program.to_account_info(),
+//             context.accounts.rent.to_account_info(),
+//         ],
+//     )?;
     
-    msg!("Master NFT created: {}", master_nft.title);
-    Ok(())
-}
+//     msg!("Master NFT created: {}", master_nft.title);
+//     Ok(())
+// }
 
 pub fn update_master_nft(
     context: Context<UpdateMasterNftAccountConstraints>,

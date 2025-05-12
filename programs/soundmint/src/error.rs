@@ -11,6 +11,9 @@ pub enum CustomError {
     #[msg("Too many social links")]
     TooManySocialLinks,
     
+    #[msg("Invalid amount provided")]
+    InvalidAmount,
+
     #[msg("Insufficient funds for this operation")]
     InsufficientFunds,
     
