@@ -481,8 +481,8 @@ pub struct MintMasterNftAccountConstraints<'info> {
         init,
         payer = authority,
         mint::decimals = 0,
-        mint::authority = authority,
-        mint::freeze_authority = authority,
+        mint::authority = authority.key(),
+        mint::freeze_authority = authority.key(),
     )]
     pub mint: Account<'info, Mint>,
     
