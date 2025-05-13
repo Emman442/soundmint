@@ -20,6 +20,5 @@ idl-build = ["anchor-lang/idl-build"]
 [dependencies]
 anchor-lang = { version = "0.30.0", features = ["init-if-needed"] }
 anchor-spl = { version = "0.30.0", features = ["metadata"] }
-arrayref = "0.3.7"
-bytemuck = { version = "1.4.0", features = ["derive", "min_const_generics"] }
+proc-macro2 = "1.0.94"
 

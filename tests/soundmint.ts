@@ -55,6 +55,8 @@ describe("soundmint", () => {
     program.programId
   );
 
+  console.log({ treasuryPDA, artistProfilePDA });
+
   // Master NFT details (used later)
   const masterNftTitle = "Cosmic Journey";
   const masterNftDescription = "An immersive electronic music experience";
@@ -80,6 +82,7 @@ describe("soundmint", () => {
     systemProgram: SystemProgram.programId,
   };
 
+  console.log({ accounts  });
   // Fund the test wallets first
   it("Setup test accounts with SOL", async () => {
     // Create a transaction to fund multiple accounts at once
