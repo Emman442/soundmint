@@ -19,7 +19,7 @@ pub fn register_streaming_batch(
         CustomError::Unauthorized
     );
     
-    let mut total_platform_fee: u64 = 0;
+    let mut total_platform_fee : u64 = 0;
     
     // Process each streaming record
     for record in &streaming_data {
@@ -49,7 +49,7 @@ pub fn register_streaming_batch(
         
         if let (Some(revenue_tracker_info), Some(royalty_split_info)) = (revenue_tracker_account_info, royalty_split_account_info) {
             // Calculate platform fee
-            let platform_fee = record.amount
+            let platform_fee: u64 = record.amount
                 .checked_mul(treasury.platform_fee_basis_points as u64).unwrap()
                 .checked_div(TOTAL_BASIS_POINTS as u64).unwrap();
             

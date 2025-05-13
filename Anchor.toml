@@ -4,6 +4,8 @@ package_manager = "yarn"
 [features]
 resolution = true
 skip-lint = false
+skip-build-docker = true
+seeds = true
 
 [programs.localnet]
 soundmint = "XsRj5cL2yV7BQehEsJHSEoy3P2Y4YXpogv4E2CJrzYQ"
