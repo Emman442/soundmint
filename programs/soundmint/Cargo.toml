@@ -24,7 +24,7 @@ arrayref = "0.3.7"
 bytemuck = { version = "1.4.0", features = ["derive", "min_const_generics"] }
 
 # mpl-token-metadata = { version = "5.1.0", features = ["no-entrypoint"] } # explicit if direct CPI needed
-mpl-token-metadata = "5.1.0"
+# mpl-token-metadata = "5.1.0"
 
 # [dependencies]
 # anchor-lang = { version = "0.31.0", features = ["init-if-needed"]}
