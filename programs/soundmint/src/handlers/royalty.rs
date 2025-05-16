@@ -113,7 +113,7 @@ pub struct MintRoyaltyNftAccountConstraints<'info> {
         seeds = [MASTER_NFT_SEED, master_nft.mint.as_ref()],
         bump = master_nft.bump
     )]
-    pub master_nft: Account<'info, MasterNft>,
+    pub master_nft: Box<Account<'info, MasterNft>>,
     
     #[account(
         mut,
@@ -121,7 +121,7 @@ pub struct MintRoyaltyNftAccountConstraints<'info> {
         bump = royalty_split.bump,
         constraint = royalty_split.master_nft == master_nft.key() @ CustomError::InvalidRoyaltySplit
     )]
-    pub royalty_split: Account<'info, RoyaltySplit>,
+    pub royalty_split: Box<Account<'info, RoyaltySplit>>,
     
     // NFT mint account
     #[account(
@@ -149,7 +149,7 @@ pub struct MintRoyaltyNftAccountConstraints<'info> {
         seeds = [ROYALTY_NFT_SEED, mint.key().as_ref()],
         bump
     )]
-    pub royalty_nft: Account<'info, RoyaltyNft>,
+    pub royalty_nft: Box<Account<'info, RoyaltyNft>>,
     
     // Required programs
     pub token_program: Program<'info, Token>,
